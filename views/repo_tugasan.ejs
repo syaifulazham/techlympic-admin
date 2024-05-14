@@ -1,0 +1,164 @@
+<%- include ('_nav.ejs') %>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-inline mx-auto">
+            <div class="form-group">
+                <select class="form-control" id="selectNegeri">
+                    <optgroup label="Zon Utara">
+                        <option value="Perlis">Perlis</option>
+                        <option value="Kedah">Kedah</option>
+                        <option value="Pulau Pinang">Pulau Pinang</option>
+                        <option value="Perak">Perak</option>
+                    </optgroup>
+                    <optgroup label="Zon Tengah">
+                        <option value="Selangor">Selangor</option>
+                        <option value="WP Kuala Lumpur">WP Kuala Lumpur</option>
+                        <option value="WP Putrajaya">WP Putrajaya</option>
+                    </optgroup>
+                    <optgroup label="Zon Selatan">
+                        <option value="Johor">Johor</option>
+                        <option value="Melaka">Melaka</option>
+                        <option value="Negeri Sembilan">Negeri Sembilan</option>
+                    </optgroup>
+                    <optgroup label="Zon Timur">
+                        <option value="Kelantan">Kelantan</option>
+                        <option value="Pahang">Pahang</option>
+                        <option value="Terengganu">Terengganu</option>
+                    </optgroup>
+                    <optgroup label="Zon Sabah">
+                        <option value="Sabah">Sabah</option>
+                        <option value="WP Labuan">WP Labuan</option>
+                    </optgroup>
+                    <optgroup label="Zon Sarawak">
+                        <option value="Sarawak">Sarawak</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPeringkat">
+                    <option value="Rendah">Rendah</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Belia">Belia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPertandingan">
+                    <option>Pertandingan 1</option>
+                    <option>Pertandingan 2</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+</nav>
+
+
+<script src="./assets/jquery/3.6.0/jquery-3.6.0.min.js"></script>
+<script src="./assets/d3/v7/d3.v7.min.js"></script>
+
+<div class="container mt-4" style="height: 600px;">
+    <div class="row">
+        <div class="col-3">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">
+                    Fly Height <br>
+                    <small>SMK Kuala Pilah, Negeri Sembilan</small>
+                </a>
+                <!-- Add more menu items here -->
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
+                    <iframe id="ifpdf" src="http://localhost:3000/uploads/5/Flow.pdf" width="100%" height="600px"></iframe>
+                </div>
+                <!-- Add more panels here -->
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    function getProgram(fn) {
+        var peringkat = $('#selectPeringkat').val();
+        $.ajax({
+            type: 'POST',
+            url: './api/util/program',
+            data: {peringkat: peringkat},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function getTugasan(negeri, pertandingan, fn) {
+        $.ajax({
+            type: 'POST',
+            url: '/api/repo/tugasan',
+            data: {negeri: negeri, pertandingan: pertandingan},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    var renderProgram = ()=>{
+        getProgram(data=>{
+            var prog = d3.select('#selectPertandingan');
+            prog.selectAll('*').remove();
+
+            prog.selectAll('option').data(data).enter().append('option').call(o=>{
+                o.attr('value',d=>d.prog_name).text(d=>d.prog_name);
+            });
+            renderTugasan();
+        })
+    }
+
+    var renderTugasan =()=>{
+        var negeri = $('#selectNegeri').val();
+        var pertandingan = $('#selectPertandingan').val();
+        getTugasan(negeri, pertandingan, data=>{
+            console.log(data);
+            var ls = d3.select('#list-tab');
+            ls.selectAll('*').remove();
+
+            ls.selectAll('a').data(data).enter().append('a').call(o=>{
+                o.attr('class', 'list-group-item list-group-item-action').attr('data-toggle','list').attr('role','tab').html(d=>`
+                    ${d.nama_kumpulan} <br />
+                    <small>${d.namasekolah.toLowerCase()}, ${d.negeri}</small>
+                `);
+
+                o.on('click', (e, d)=>{
+                    d3.select('#ifpdf').attr('src',`http://localhost:3000/${d.obj_file}`);
+                })
+            })
+        })
+    }
+</script>
+
+
+<script>
+    $(document).ready(()=>{
+        renderProgram();
+
+        d3.select('#selectPeringkat').on('change', (e, d)=>{
+            renderProgram();
+        });
+
+        d3.select('#selectPertandingan').on('change', ()=>{
+            renderTugasan();
+        });
+
+        d3.select('#selectNegeri').on('change', ()=>{
+            renderTugasan();
+        })
+    })
+</script>
