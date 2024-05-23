@@ -24,6 +24,49 @@ let API = {
                 console.log('Error executing program: ', err);
             }
         },
+        allprogram: (fn) => {
+            var con = mysql.createConnection(auth.auth()[__DATA__SCHEMA__]);
+            try {
+                sqlstr = `
+                select * from program
+                `;
+                con.query(sqlstr, [targetGroup], function (err, result) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        con.end();
+                        fn(result);
+                    }
+                });
+            } catch (err) {
+                console.log('Error executing program: ', err);
+            }
+        },
+    },
+    stats:{
+        penyertaan: (prog_name, target_group, fn) =>{
+            var con = mysql.createConnection(auth.auth()[__DATA__SCHEMA__]);
+            try {
+                sqlstr = `
+                select b.negeri, a.* from 
+                (SELECT  kodsekolah, jantina, YEAR(tarikh_lahir) yob, 
+                ? pertandingan, ? peringkat, COUNT(*) total FROM peserta 
+                WHERE program REGEXP ? 
+                GROUP BY kodsekolah, jantina, yob, pertandingan, peringkat) a
+                left join sekolah b using(kodsekolah)
+                `;
+                con.query(sqlstr, [prog_name, target_group, prog_name], function (err, result) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        con.end();
+                        fn(result);
+                    }
+                });
+            } catch (err) {
+                console.log('Error executing program: ', err);
+            }
+        }
     },
     repo:{
         tugasan: (negeri, pertandingan, fn) => {

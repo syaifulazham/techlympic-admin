@@ -1,26 +1,26 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="./">MT-Admin</a>
         <div class="dropdown">
-            <button class="btn dropdown-toggle" type="button" id="dropdownMenuPengesahan" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuPengesahan" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Pengesahan
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuPengesahan">
-                <a class="dropdown-item" href="#">Negeri</a>
-                <a class="dropdown-item" href="#">Kebangsaan</a>
+                <a class="dropdown-item" href="/pengesahan-negeri">Negeri</a>
+                <a class="dropdown-item" href="/pengesahan-kebangsaan">Kebangsaan</a>
             </div>
         </div>
         <div class="dropdown">
-            <button class="btn dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Laporan
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <a class="dropdown-item" href="#">Laporan Penyertaan</a>
+                <a class="dropdown-item" href="/stats-penyertaan">Laporan Penyertaan</a>
                 <a class="dropdown-item" href="#">Laporan Umum</a>
             </div>
         </div>
         <div class="dropdown">
-            <button class="btn dropdown-toggle" type="button" id="dropdownMenuRepo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuRepo" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Repositori
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuRepo">
@@ -29,7 +29,17 @@
             </div>
         </div>
         <div class="form-inline ml-auto">
-            <button class="btn" type="button" id="btnProfile" aria-haspopup="true" aria-expanded="false">
+            <div class="dropdown">
+                <button class="btn btn-dark dropdown-toggle" type="button" id="dropdownMenuPengesahan" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Tetapan
+                </button>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuPengesahan">
+                    <a class="dropdown-item" href="./__setpertandingan">Pertandingan</a>
+                    <a class="dropdown-item" href="./__setsekolah">Sekolah</a>
+                    <a class="dropdown-item" href="./__setusers">Pengguna</a>
+                </div>
+            </div>
+            <button class="btn btn-dark" type="button" id="btnProfile" aria-haspopup="true" aria-expanded="false">
                 Profile
             </button>
         </div>

@@ -1,0 +1,108 @@
+<%- include ('_nav.ejs') %>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-inline mx-auto">
+            <div class="form-group">
+                <select class="form-control" id="selectPeringkat">
+                    <option value="Rendah">Rendah</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Belia">Belia</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<script src="./assets/jquery/3.6.0/jquery-3.6.0.min.js"></script>
+<script src="./assets/d3/v7/d3.v7.min.js"></script>
+
+<div id="main-container" class="container mt-4">
+
+</div>
+
+<script>
+    function getProgram(fn) {
+        var peringkat = $('#selectPeringkat').val();
+        $.ajax({
+            type: 'POST',
+            url: './api/util/program',
+            data: {peringkat: peringkat},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    var renderProgram = ()=>{
+        getProgram(data=>{
+            console.log(data);
+            var cont = d3.select('#main-container');
+            cont.selectAll('*').remove();
+
+            var tbl = cont.append('table').attr('class','table');
+
+            var thead = tbl.append('thead');
+            thead.append('tr').selectAll('th').data(['Tema','Kod','Nama','Peringkat','Skima Warna']).enter().append('th').text(d=>d);
+
+            var tbody = tbl.append('tbody');
+            tbody.selectAll('tr').data(data).enter().append('tr').call(o=>{
+                var theme = o.append('td').append('select')
+                    .attr('class', 'form-control').attr('style','border: none')
+                    .selectAll('option')
+                    .data(d=>[
+                        {chk: d.theme==='', val:''}, 
+                        {chk: d.theme==='Aeroangkasa', val:'Aeroangkasa'}, 
+                        {chk: d.theme==='Inovasi, Kreativiti untuk Kesejahteraan Rakyat', val:'Inovasi, Kreativiti untuk Kesejahteraan Rakyat'}, 
+                        {chk: d.theme==='Kecerdasan Buatan dan Sains Data', val:'Kecerdasan Buatan dan Sains Data'}, 
+                        {chk: d.theme==='Keterangkuman Malaysia Madani', val:'Keterangkuman Malaysia Madani'}, 
+                        {chk: d.theme==='Sains & Inovasi', val:'Sains & Inovasi'}, 
+                        {chk: d.theme==='Teknologi Sohor', val:'Teknologi Sohor'}])
+                    .enter().append('option')
+                    .attr('value', d => d.val)
+                    .text(d => d.val).property('selected', d => d.chk);
+                    
+                o.append('td').append('input')
+                    .attr('type', 'text')
+                    .attr('class', 'form-control')
+                    .attr('style', 'border: none; width: 80px')
+                    .attr('value', d=>d.prog_code);
+
+                o.append('td').append('input')
+                    .attr('type', 'text')
+                    .attr('class', 'form-control')
+                    .attr('style', 'border: none')
+                    .attr('value', d=>d.prog_name);
+                
+                var targetGroup = o.append('td').append('select')
+                    .attr('class', 'form-control').attr('style','border: none')
+                    .selectAll('option')
+                    .data(d=>[
+                        {chk: d.target_group==='', val:''}, 
+                        {chk: d.target_group==='Rendah', val:'Rendah'}, 
+                        {chk: d.target_group==='Menengah', val:'Menengah'}, 
+                        {chk: d.target_group==='Belia', val:'Belia'}])
+                    .enter().append('option')
+                    .attr('value', d => d.val)
+                    .text(d => d.val).property('selected', d => d.chk);
+                var colorInput = o.append('td').append('input')
+                    .attr('type', 'color')
+                    .attr('value', d => d.color);
+            })
+        })
+    }
+
+</script>
+
+<script>
+    $(document).ready(()=>{
+        renderProgram();
+
+        d3.select('#selectPeringkat').on('change', (e, d)=>{
+            renderProgram();
+        });
+    });
+</script>

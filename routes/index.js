@@ -36,6 +36,63 @@ router.get('/', (req, res) => {
     
   });
 
+  router.get('/__setpertandingan', (req, res) => {
+    try{
+      //var sessionId = mysession(req.cookies['connect.sid']);
+      var session = req.cookies['localId'];
+      res.render('index.ejs', { user: {}, page: 'tetapan_pertandingan.ejs' });
+  
+      console.log('---------------->> ',session);
+    }catch(err){
+      //console.log(err);
+      res.render('index.ejs', { user: {}, page: '' });
+    }
+    
+  });
+
+  router.get('/stats-penyertaan', (req, res) => {
+    try{
+      //var sessionId = mysession(req.cookies['connect.sid']);
+      var session = req.cookies['localId'];
+      res.render('index.ejs', { user: {}, page: 'stats_penyertaan.ejs' });
+  
+      console.log('---------------->> ',session);
+    }catch(err){
+      //console.log(err);
+      res.render('index.ejs', { user: {}, page: '' });
+    }
+    
+  });
+
+  router.get('/pengesahan-negeri', (req, res) => {
+    try{
+      //var sessionId = mysession(req.cookies['connect.sid']);
+      var session = req.cookies['localId'];
+      res.render('index.ejs', { user: {}, page: 'pengesahan_negeri.ejs' });
+  
+      console.log('---------------->> ',session);
+    }catch(err){
+      //console.log(err);
+      res.render('index.ejs', { user: {}, page: '' });
+    }
+    
+  });
+
+  router.get('/pengesahan-kebangsaan', (req, res) => {
+    try{
+      //var sessionId = mysession(req.cookies['connect.sid']);
+      var session = req.cookies['localId'];
+      res.render('index.ejs', { user: {}, page: 'pengesahan_kebangsaan.ejs' });
+  
+      console.log('---------------->> ',session);
+    }catch(err){
+      //console.log(err);
+      res.render('index.ejs', { user: {}, page: '' });
+    }
+    
+  });
+
+
 router.post('/api/search/sekolah', (req, res)=>{
     API.search.sekolah(req.body.searchstr, data=>{
         res.send(data);
@@ -62,6 +119,12 @@ router.post('/api/repo/tugasan', (req, res)=>{
 
 router.post('/api/util/program', (req, res)=>{
     API.util.program(req.body.peringkat, data=>{
+        res.send(data);
+    })
+});
+
+router.post('/api/stats/penyertaan', (req, res)=>{
+    API.stats.penyertaan(req.body.pertandingan, req.body.peringkat, data=>{
         res.send(data);
     })
 });

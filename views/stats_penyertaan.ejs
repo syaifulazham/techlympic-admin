@@ -1,0 +1,162 @@
+<%- include ('_nav.ejs') %>
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="card col-4">
+            <div class="card-header">
+                Negeri
+            </div>
+            <div id="cardNegeri" class="card-body">
+                <!-- Your content here -->
+            </div>
+        </div>
+        <div class="card col-4">
+            <div class="card-header">
+                Jantina
+            </div>
+            <div id="cardJantina" class="card-body">
+                <!-- Your content here -->
+            </div>
+        </div>
+        <div class="card col-4">
+            <div class="card-header">
+                Tahun Lahir
+            </div>
+            <div id="cardYob" class="card-body">
+                <!-- Your content here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="./assets/jquery/3.6.0/jquery-3.6.0.min.js"></script>
+<script src="./assets/d3/v7/d3.v7.min.js"></script>
+
+<script>
+    function getProgram(peringkat, fn) {
+        //var peringkat = $('#selectPeringkat').val();
+        $.ajax({
+            type: 'POST',
+            url: './api/util/program',
+            data: {peringkat: peringkat},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function getStatsPenyertaan(pertandingan, peringkat, fn) {
+        $.ajax({
+            type: 'POST',
+            url: './api/stats/penyertaan',
+            data: {peringkat: peringkat, pertandingan: pertandingan},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    var _STATS_ = [];
+    var stats_size = 0;
+
+    function loadStatsPenyertaan(peringkat){
+        getProgram(peringkat, prog=>{
+            prog.forEach(d=>{
+                getStatsPenyertaan(d.prog_name, d.target_group, data=>{
+                    data.forEach(k=>{
+                        _STATS_.push(k)
+                    })
+                    
+                })
+            })
+        })
+    }
+
+    function createBarChart(data, containerName, area) {
+        
+        var countkeys = {};
+        data.forEach(function(d) {
+            countkeys[d[area]] = (countkeys[d[area]] || 0) + 1;
+        });
+        var itmCount = Object.keys(countkeys).length;
+
+        console.log('itmCount', itmCount);
+
+        var dim = {
+            height: 80,
+            width: $(containerName).width()
+        }
+
+        var bar = {
+            height: 25,
+            gap: 2
+        }
+
+        var d_ = Array.from(d3.group(data, d => d[area]), ([key, value]) => ({
+            item: key === null ? 'Lain-lain' : key,
+            total: value.reduce((a, b) => a + b.total, 0),
+            color: key==='Lelaki'?'#008' : '#800'
+        }));
+
+        var maxTotal = d3.max(d_, d => d.total);
+
+        d3.select(containerName).selectAll('*').remove();
+
+        var svg = d3.select(containerName)
+            .append("svg")
+            .attr("width", dim.width)
+            .attr("height", dim.height);
+
+        var g = svg.selectAll("g")
+            .data(d_)
+            .enter().append("g")
+            .attr("transform", function(d, i) { return "translate(0," + i * (bar.height + bar.gap) + ")"; });
+
+        g.append("rect")
+            .attr("x", 80)
+            .attr("fill", d=>d.color)
+            .attr("width", function(d) { return d.total / maxTotal * (dim.width - 200) + 80; })
+            .attr("height", bar.height);
+
+        g.append("text")
+            .attr("x", 75)
+            .attr("y", bar.height / 2)
+            .attr("dy", ".35em")
+            .text(function(d) { return d.item; })
+            .style("text-anchor", "end");
+
+        g.append("text")
+            .attr("x", function(d) { return d.total / maxTotal * (dim.width - 200) + 85; })
+            .attr("y", bar.height / 2)
+            .attr("fill", "#fff")
+            .attr("dy", ".35em")
+            .text(function(d) { return d.total; })
+            .style("text-anchor", "start");
+
+        console.log('data======>>>', d_);
+    }
+
+</script>
+
+<script>
+    $(document).ready(()=>{
+        loadStatsPenyertaan('Rendah');
+
+        setInterval(function(){
+            if(_STATS_.length !== stats_size){
+                console.log("Stats updated");
+                stats_size = _STATS_.length;
+                $('#recCount').text(stats_size);
+                createBarChart(_STATS_,'#cardNegeri','negeri');
+                createBarChart(_STATS_,'#cardJantina','jantina');
+                createBarChart(_STATS_,'#cardYob','yob');
+            }
+        }, 5000);
+    })
+</script>

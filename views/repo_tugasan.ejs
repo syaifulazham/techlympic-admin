@@ -57,24 +57,71 @@
 <script src="./assets/jquery/3.6.0/jquery-3.6.0.min.js"></script>
 <script src="./assets/d3/v7/d3.v7.min.js"></script>
 
-<div class="container mt-4" style="height: 600px;">
+<div class="container-fluid mt-4" style="height: 600px;">
     <div class="row">
-        <div class="col-3">
+        <div class="col-2">
+            <div class="panel-heading">
+                <h4>Tugasan</h4>
+            </div>
             <div class="list-group" id="list-tab" role="tablist">
+                <!--
                 <a class="list-group-item list-group-item-action active" id="list-home-list" data-toggle="list" href="#list-home" role="tab" aria-controls="home">
                     Fly Height <br>
                     <small>SMK Kuala Pilah, Negeri Sembilan</small>
-                </a>
+                </a>-->
                 <!-- Add more menu items here -->
             </div>
         </div>
-        <div class="col-9">
+        <div class="col-8">
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="list-home" role="tabpanel" aria-labelledby="list-home-list">
-                    <iframe id="ifpdf" src="http://localhost:3000/uploads/5/Flow.pdf" width="100%" height="600px"></iframe>
+                    <iframe id="ifpdf" src="" width="100%" height="800px"></iframe>
                 </div>
                 <!-- Add more panels here -->
             </div>
+        </div>
+        <div class="col-2">
+            <div class="panel-heading">
+               <h4>Properties</h4> 
+            </div>
+            <table class="table table-borderless">
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Nama Fail</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtFile" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Sekolah</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtSekolah" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Kumpulan</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtKumpulan" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Guru</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtGuru" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Status</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtStatus" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Markah</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtMarkah" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tr>
+                    <td style="border: none; border-bottom: 1px dotted;">Nota Penganjur</td>
+                    <td style="border: none; border-bottom: 1px dotted;"><input id="txtNota" type="text" class="form-control" style="border: none;"></td>
+                </tr>
+                <tfoot>
+                    <tr>
+                        <td></td>
+                        <td style="text-align: right;">
+                            <button type="button" class="btn btn-primary">Simpan</button>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
         </div>
     </div>
     
@@ -138,6 +185,12 @@
 
                 o.on('click', (e, d)=>{
                     d3.select('#ifpdf').attr('src',`http://localhost:3000/${d.obj_file}`);
+                    var windowHeight = $(window).height();
+                    $('#ifpdf').css('height', windowHeight);
+                    $('#txtFile').val(d.obj_file.split('/')[2]);
+                    $('#txtSekolah').val(d.namasekolah);
+                    $('#txtKumpulan').val(d.nama_kumpulan);
+                    $('#txtGuru').val(d.pengiring);
                 })
             })
         })
@@ -159,6 +212,11 @@
 
         d3.select('#selectNegeri').on('change', ()=>{
             renderTugasan();
-        })
+        });
+
+        $(window).on('resize', function(){
+            var windowHeight = $(window).height();
+            $('#ifpdf').css('height', windowHeight);
+        });
     })
 </script>
