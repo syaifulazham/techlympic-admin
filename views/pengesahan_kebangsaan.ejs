@@ -1,3 +1,54 @@
 <%- include ('_nav.ejs') %>
 
-<h2>kebangsaan</h2>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-inline mx-auto">
+            <div class="form-group">
+                <select class="form-control" id="selectNegeri">
+                    <optgroup label="Zon Utara">
+                        <option value="Perlis">Perlis</option>
+                        <option value="Kedah">Kedah</option>
+                        <option value="Pulau Pinang">Pulau Pinang</option>
+                        <option value="Perak">Perak</option>
+                    </optgroup>
+                    <optgroup label="Zon Tengah">
+                        <option value="Selangor">Selangor</option>
+                        <option value="WP Kuala Lumpur">WP Kuala Lumpur</option>
+                        <option value="WP Putrajaya">WP Putrajaya</option>
+                    </optgroup>
+                    <optgroup label="Zon Selatan">
+                        <option value="Johor">Johor</option>
+                        <option value="Melaka">Melaka</option>
+                        <option value="Negeri Sembilan">Negeri Sembilan</option>
+                    </optgroup>
+                    <optgroup label="Zon Timur">
+                        <option value="Kelantan">Kelantan</option>
+                        <option value="Pahang">Pahang</option>
+                        <option value="Terengganu">Terengganu</option>
+                    </optgroup>
+                    <optgroup label="Zon Sabah">
+                        <option value="Sabah">Sabah</option>
+                        <option value="WP Labuan">WP Labuan</option>
+                    </optgroup>
+                    <optgroup label="Zon Sarawak">
+                        <option value="Sarawak">Sarawak</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPeringkat">
+                    <option value="Rendah">Rendah</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Belia">Belia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPertandingan">
+                    <option>Pertandingan 1</option>
+                    <option>Pertandingan 2</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+</nav>

@@ -1,29 +1,96 @@
 <%- include ('_nav.ejs') %>
-
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-inline mx-auto">
+            <div class="form-group">
+                <select class="form-control" id="selectPeringkat">
+                    <option value="Rendah">Rendah</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Belia">Belia</option>
+                    <option value="">All</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</nav>
 <div class="container mt-4">
     <div class="row">
-        <div class="card col-4">
-            <div class="card-header">
-                Negeri
-            </div>
-            <div id="cardNegeri" class="card-body">
-                <!-- Your content here -->
-            </div>
-        </div>
-        <div class="card col-4">
-            <div class="card-header">
-                Jantina
-            </div>
-            <div id="cardJantina" class="card-body">
-                <!-- Your content here -->
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Penyertaan
+                </div>
+                <div id="cardPenyertaan" class="card-body">
+                    <!-- Your content here -->
+                </div>
             </div>
         </div>
-        <div class="card col-4">
-            <div class="card-header">
-                Tahun Lahir
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Peringkat
+                </div>
+                <div id="cardPeringkat" class="card-body">
+                    <!-- Your content here -->
+                </div>
             </div>
-            <div id="cardYob" class="card-body">
-                <!-- Your content here -->
+        </div>
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Jantina
+                </div>
+                <div id="cardJantina" class="card-body">
+                    <!-- Your content here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Negeri
+                </div>
+                <div id="cardNegeri" class="card-body">
+                    <!-- Your content here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Tahun Lahir
+                </div>
+                <div id="cardYob" class="card-body">
+                    <!-- Your content here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Pertandingan
+                </div>
+                <div id="cardPertandingan" class="card-body">
+                    <!-- Your content here -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-4">
+            <div class="card">
+                <div class="card-header">
+                    Sekolah
+                </div>
+                <div id="cardSekolah" class="card-body">
+                    <!-- Your content here -->
+                </div>
             </div>
         </div>
     </div>
@@ -62,10 +129,43 @@
         });
     }
 
+    function renderSpinner(containerName) {
+        d3.select(containerName).selectAll('*').remove();
+        var svg = d3.select(containerName)
+        .append("svg")
+        .attr("width", 200)
+        .attr("height", 30);
+
+        function circleTransition() { 
+
+            var timeCircle = svg.append("circle")
+                .attr("fill", "steelblue")
+                .attr("r", 10);
+            repeat();
+            
+            function repeat() {
+            timeCircle
+                .attr('cx', 20)      // position the circle at 40 on the x axis
+                .attr('cy', 20)     // position the circle at 250 on the y axis
+                .transition()        // apply a transition
+                .duration(2000)      // apply it over 2000 milliseconds
+                .attr('cx', 140)     // move the circle to 920 on the x axis
+                .transition()        // apply a transition
+                .duration(2000)      // apply it over 2000 milliseconds
+                .attr('cx', 20)      // return the circle to 40 on the x axis
+                .on("end", repeat);  // when the transition finishes start again
+            };
+
+        };
+
+        circleTransition();
+    }
+
     var _STATS_ = [];
     var stats_size = 0;
 
     function loadStatsPenyertaan(peringkat){
+
         getProgram(peringkat, prog=>{
             prog.forEach(d=>{
                 getStatsPenyertaan(d.prog_name, d.target_group, data=>{
@@ -89,7 +189,7 @@
         console.log('itmCount', itmCount);
 
         var dim = {
-            height: 80,
+            height: 35*itmCount,
             width: $(containerName).width()
         }
 
@@ -114,7 +214,7 @@
             .attr("height", dim.height);
 
         var g = svg.selectAll("g")
-            .data(d_)
+            .data(d3.sort(d_, (a, b)=>a.key > b.key))
             .enter().append("g")
             .attr("transform", function(d, i) { return "translate(0," + i * (bar.height + bar.gap) + ")"; });
 
@@ -122,7 +222,9 @@
             .attr("x", 80)
             .attr("fill", d=>d.color)
             .attr("width", function(d) { return d.total / maxTotal * (dim.width - 200) + 80; })
-            .attr("height", bar.height);
+            .attr("height", bar.height)
+            .transition()
+            .duration(600);
 
         g.append("text")
             .attr("x", 75)
@@ -132,31 +234,61 @@
             .style("text-anchor", "end");
 
         g.append("text")
-            .attr("x", function(d) { return d.total / maxTotal * (dim.width - 200) + 85; })
+            .attr("x", function(d) { return d.total / maxTotal * (dim.width - 200) + 85 + 70; })
             .attr("y", bar.height / 2)
             .attr("fill", "#fff")
             .attr("dy", ".35em")
             .text(function(d) { return d.total; })
-            .style("text-anchor", "start");
+            .style("text-anchor", "end");
 
         console.log('data======>>>', d_);
+    }
+
+    function renderTotal(containerName){
+        var sum = 0;
+        _STATS_.map(a=>{
+            sum += a.total;
+        });
+
+        d3.select(containerName).selectAll('*').remove();
+        d3.select(containerName).append('h1').text(sum);
+    }
+
+    function loadTheGraph(peringkat){
+        _STATS_=[];
+        renderSpinner('#cardPenyertaan');
+        renderSpinner('#cardNegeri');
+        renderSpinner('#cardPeringkat');
+        renderSpinner('#cardJantina');
+        renderSpinner('#cardYob');
+        renderSpinner('#cardPertandingan');
+        renderSpinner('#cardSekolah');
+        loadStatsPenyertaan(peringkat);
+
+        setInterval(function(){
+            if(_STATS_.length !== stats_size){
+                stats_size = _STATS_.length;
+                $('#recCount').text(stats_size);
+                renderTotal('#cardPenyertaan');
+                createBarChart(_STATS_,'#cardNegeri','negeri');
+                createBarChart(_STATS_,'#cardPeringkat','peringkat');
+                createBarChart(_STATS_,'#cardJantina','jantina');
+                createBarChart(_STATS_,'#cardYob','yob');
+                createBarChart(_STATS_,'#cardPertandingan','pertandingan');
+                createBarChart(_STATS_,'#cardSekolah','kodsekolah');
+            }
+        }, 5000);
     }
 
 </script>
 
 <script>
     $(document).ready(()=>{
-        loadStatsPenyertaan('Rendah');
+        loadTheGraph('Rendah');
 
-        setInterval(function(){
-            if(_STATS_.length !== stats_size){
-                console.log("Stats updated");
-                stats_size = _STATS_.length;
-                $('#recCount').text(stats_size);
-                createBarChart(_STATS_,'#cardNegeri','negeri');
-                createBarChart(_STATS_,'#cardJantina','jantina');
-                createBarChart(_STATS_,'#cardYob','yob');
-            }
-        }, 5000);
+        d3.select('#selectPeringkat').on('change', ()=>{
+            var peringkat = $('#selectPeringkat').val();
+            loadTheGraph(peringkat);
+        })
     })
 </script>

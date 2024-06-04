@@ -8,11 +8,13 @@ let API = {
     util:{
         program: (targetGroup, fn) => {
             var con = mysql.createConnection(auth.auth()[__DATA__SCHEMA__]);
+            const tg = targetGroup !== '' ? 'where target_group = ?' : '';
+            const arr_par = targetGroup !== '' ? [targetGroup] : [];
             try {
                 sqlstr = `
-                select * from program where target_group = ?
+                select * from program ${tg}
                 `;
-                con.query(sqlstr, [targetGroup], function (err, result) {
+                con.query(sqlstr, arr_par, function (err, result) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -43,19 +45,46 @@ let API = {
             }
         },
     },
+    list: {
+        kumpulan: (negeri, pertandingan, fn) => {
+            var con = mysql.createConnection(auth.auth()[__DATA__SCHEMA__]);
+            try {
+                var sqlstr = `
+                SELECT a.*, ifnull(c.namasekolah, '') namasekolah, ifnull(b.total,0) members from kumpulan a
+                LEFT JOIN 
+                (SELECT groupid, COUNT(*) total FROM kumpulan_members GROUP BY groupid) b USING(groupid)
+                LEFT JOIN sekolah c USING(kodsekolah)
+                WHERE a.negeri = ? AND a.program = ?
+                `;
+                con.query(sqlstr, [negeri, pertandingan], function (err, result) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        con.end();
+                        fn(result);
+                    }
+                });
+            } catch (err) {
+                console.log('Error executing queryGroups: ', err);
+            }
+        },
+    },
     stats:{
         penyertaan: (prog_name, target_group, fn) =>{
             var con = mysql.createConnection(auth.auth()[__DATA__SCHEMA__]);
+
+            const tg = target_group!== '' ?  '? peringkat' : 'target_group peringkat';
+            const arr_par = target_group!== '' ? [prog_name, target_group, prog_name] : [prog_name, prog_name];
             try {
-                sqlstr = `
+                var sqlstr = `
                 select b.negeri, a.* from 
                 (SELECT  kodsekolah, jantina, YEAR(tarikh_lahir) yob, 
-                ? pertandingan, ? peringkat, COUNT(*) total FROM peserta 
+                ? pertandingan, ${tg}, COUNT(*) total FROM peserta 
                 WHERE program REGEXP ? 
                 GROUP BY kodsekolah, jantina, yob, pertandingan, peringkat) a
                 left join sekolah b using(kodsekolah)
                 `;
-                con.query(sqlstr, [prog_name, target_group, prog_name], function (err, result) {
+                con.query(sqlstr, arr_par, function (err, result) {
                     if (err) {
                         console.log(err);
                     } else {

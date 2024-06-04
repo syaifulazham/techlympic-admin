@@ -1,3 +1,170 @@
 <%- include ('_nav.ejs') %>
 
-<h2>negeri</h2>
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <div class="form-inline mx-auto">
+            <div class="form-group">
+                <select class="form-control" id="selectNegeri">
+                    <optgroup label="Zon Utara">
+                        <option value="Perlis">Perlis</option>
+                        <option value="Kedah">Kedah</option>
+                        <option value="Pulau Pinang">Pulau Pinang</option>
+                        <option value="Perak">Perak</option>
+                    </optgroup>
+                    <optgroup label="Zon Tengah">
+                        <option value="Selangor">Selangor</option>
+                        <option value="WP Kuala Lumpur">WP Kuala Lumpur</option>
+                        <option value="WP Putrajaya">WP Putrajaya</option>
+                    </optgroup>
+                    <optgroup label="Zon Selatan">
+                        <option value="Johor">Johor</option>
+                        <option value="Melaka">Melaka</option>
+                        <option value="Negeri Sembilan">Negeri Sembilan</option>
+                    </optgroup>
+                    <optgroup label="Zon Timur">
+                        <option value="Kelantan">Kelantan</option>
+                        <option value="Pahang">Pahang</option>
+                        <option value="Terengganu">Terengganu</option>
+                    </optgroup>
+                    <optgroup label="Zon Sabah">
+                        <option value="Sabah">Sabah</option>
+                        <option value="WP Labuan">WP Labuan</option>
+                    </optgroup>
+                    <optgroup label="Zon Sarawak">
+                        <option value="Sarawak">Sarawak</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPeringkat">
+                    <option value="Rendah">Rendah</option>
+                    <option value="Menengah">Menengah</option>
+                    <option value="Belia">Belia</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <select class="form-control" id="selectPertandingan">
+                    <option>Pertandingan 1</option>
+                    <option>Pertandingan 2</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    
+</nav>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-12">
+
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:50px">#</th>
+                    <th style="width: 120px;">Negeri</th>
+                    <th style="width: 80px;">Kod</th>
+                    <th>Sekolah</th>
+                    <th>Kumpulan</th>
+                    <th style="width: 30px;">Ahli</th>
+                    <th style="width: 30px;">Disahkan</th>
+                </tr>
+            </thead>
+            <tbody id="tblrows">
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="./assets/jquery/3.6.0/jquery-3.6.0.min.js"></script>
+<script src="./assets/d3/v7/d3.v7.min.js"></script>
+
+<script>
+    function getProgram(fn) {
+        var peringkat = $('#selectPeringkat').val();
+        $.ajax({
+            type: 'POST',
+            url: './api/util/program',
+            data: {peringkat: peringkat},
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    function getListKumpulan(fn) {
+        var negeri = $('#selectNegeri').val();
+        var pertandingan = $('#selectPertandingan').val();
+        $.ajax({
+            type: 'POST',
+            url: './api/list/kumpulan',
+            data: { negeri: negeri, pertandingan: pertandingan },
+            success: function(data) {
+                fn(data);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+    }
+
+    var renderProgram = ()=>{
+        getProgram(data=>{
+            var prog = d3.select('#selectPertandingan');
+            prog.selectAll('*').remove();
+
+            prog.selectAll('option').data(data).enter().append('option').call(o=>{
+                o.attr('value',d=>d.prog_name).text(d=>d.prog_name);
+            });
+            
+        })
+    }
+
+    var renderKumpulanRows = () => {
+        getListKumpulan(data => {
+            var tbody = d3.select('#tblrows');
+            tbody.selectAll('tr').remove(); // Clear existing rows
+
+            tbody.selectAll('tr')
+                .data(data)
+                .enter()
+                .append('tr')
+                .call(o=>{
+                    o.append('td').text((d,i)=>i+1);
+                    o.append('td').text(d=>d.negeri);
+                    o.append('td').text(d=>d.kodsekolah);
+                    o.append('td').text(d=>d.namasekolah);
+                    o.append('td').text(d=>d.nama_kumpulan);
+                    o.append('td').style('text-align', 'center').style('color', d=>d.members===0 ? '#f00' : '#080').text(d=>d.members);
+                    o.append('td').style('text-align', 'center').text(d=>d.join_negeri===1 ? 'X' : '--');
+                })
+                /*
+                .data((d, i) => [i+1, d.negeri, d.kodsekolah, d.namasekolah, d.nama_kumpulan, d.members])
+                .enter()
+                .append('td')
+                .text(d => d);*/
+        });
+    }
+
+
+    $(document).ready(() => {
+        renderProgram();
+        
+        $('#selectPertandingan').on('change', () => {
+            renderKumpulanRows();
+        });
+        
+        $('#selectNegeri').on('change', () => {
+            renderKumpulanRows();
+        });
+
+        $('#selectPeringkat').on('change', () => {
+            renderProgram();
+        });
+    })
+
+</script>

@@ -92,6 +92,10 @@ router.get('/', (req, res) => {
     
   });
 
+  router.get('/login', (req, res) => {
+    res.render('index.ejs', { user: {}, page: 'login.ejs' });
+  })
+
 
 router.post('/api/search/sekolah', (req, res)=>{
     API.search.sekolah(req.body.searchstr, data=>{
@@ -127,6 +131,12 @@ router.post('/api/stats/penyertaan', (req, res)=>{
     API.stats.penyertaan(req.body.pertandingan, req.body.peringkat, data=>{
         res.send(data);
     })
+});
+
+router.post('/api/list/kumpulan', (req, res)=>{
+  API.list.kumpulan(req.body.negeri, req.body.pertandingan, data=>{
+      res.send(data);
+  })
 });
 
 module.exports = router;

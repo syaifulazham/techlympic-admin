@@ -46,7 +46,7 @@
             var tbl = cont.append('table').attr('class','table');
 
             var thead = tbl.append('thead');
-            thead.append('tr').selectAll('th').data(['Tema','Kod','Nama','Peringkat','Skima Warna']).enter().append('th').text(d=>d);
+            thead.append('tr').selectAll('th').data(['Tema','Kod','Nama','Peringkat','Skima Warna','Maks. Kump','Maks. Ahli']).enter().append('th').text(d=>d);
 
             var tbody = tbl.append('tbody');
             tbody.selectAll('tr').data(data).enter().append('tr').call(o=>{
@@ -91,6 +91,18 @@
                 var colorInput = o.append('td').append('input')
                     .attr('type', 'color')
                     .attr('value', d => d.color);
+
+                o.append('td').append('input')
+                    .attr('type', 'text')
+                    .attr('class', 'form-control')
+                    .attr('style', 'border: none')
+                    .attr('value', d=>d.max_group);
+
+                o.append('td').append('input')
+                    .attr('type', 'text')
+                    .attr('class', 'form-control')
+                    .attr('style', 'border: none')
+                    .attr('value', d=>d.max_pergroup);
             })
         })
     }
